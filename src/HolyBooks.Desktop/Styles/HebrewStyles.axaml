@@ -114,4 +114,92 @@
         <Setter Property="Background" Value="#F5F5F5" />
     </Style>
 
+    <!-- Book/Tractate Button -->
+    <Style Selector="Button.book-button">
+        <Setter Property="Background" Value="#E3F2FD" />
+        <Setter Property="Foreground" Value="#1565C0" />
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <Style Selector="Button.book-button:pointerover">
+        <Setter Property="Background" Value="#BBDEFB" />
+    </Style>
+
+    <Style Selector="Button.book-button:pressed">
+        <Setter Property="Background" Value="#90CAF9" />
+    </Style>
+
+    <!-- Commentary Tag -->
+    <Style Selector="ToggleButton.commentary-tag">
+        <Setter Property="Background" Value="#F5F5F5" />
+        <Setter Property="Foreground" Value="#616161" />
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="#E0E0E0" />
+    </Style>
+
+    <Style Selector="ToggleButton.commentary-tag:checked">
+        <Setter Property="Background" Value="#1976D2" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="#1976D2" />
+    </Style>
+
+    <!-- Verse Number -->
+    <Style Selector="TextBlock.verse-number">
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="#1976D2" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Margin" Value="0,4,8,0" />
+    </Style>
+
+    <!-- Talmud Text Styles -->
+    <Style Selector="TextBlock.gemara-text">
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFontSerif}" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="LineHeight" Value="32" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="TextAlignment" Value="Right" />
+    </Style>
+
+    <Style Selector="TextBlock.rashi-text">
+        <Setter Property="FontFamily" Value="Rashi, David, Serif" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="LineHeight" Value="24" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="TextAlignment" Value="Right" />
+    </Style>
+
+    <Style Selector="TextBlock.tosafot-text">
+        <Setter Property="FontFamily" Value="Rashi, David, Serif" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="LineHeight" Value="24" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="TextAlignment" Value="Right" />
+    </Style>
+
+    <!-- Daf Navigation -->
+    <Style Selector="Button.daf-nav">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <Style Selector="Button.daf-nav:pointerover">
+        <Setter Property="Background" Value="#F5F5F5" />
+    </Style>
+
 </Styles>

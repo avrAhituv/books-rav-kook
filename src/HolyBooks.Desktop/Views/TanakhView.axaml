@@ -1,0 +1,185 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:HolyBooks.Desktop.ViewModels"
+             x:Class="HolyBooks.Desktop.Views.TanakhView"
+             x:DataType="vm:TanakhViewModel"
+             FlowDirection="RightToLeft">
+
+    <Grid ColumnDefinitions="250,*">
+
+        <!-- Left Sidebar: Book Selection -->
+        <Border Grid.Column="0" Background="#F8F8F8"
+                BorderBrush="#E0E0E0" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <Border DockPanel.Dock="Top" Background="#EEEEEE" Padding="12,8">
+                    <TextBlock Text="ספרי תנ״ך" FontWeight="SemiBold"
+                               FontFamily="{StaticResource HebrewFont}" />
+                </Border>
+
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding Books}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding $parent[UserControl].((vm:TanakhViewModel)DataContext).SelectBookCommand}"
+                                        CommandParameter="{Binding}"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Right"
+                                        Background="Transparent"
+                                        Padding="12,8"
+                                        Margin="0">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{Binding HebrewName}"
+                                                   FontFamily="{StaticResource HebrewFont}" />
+                                        <TextBlock Text="{Binding Chapters, StringFormat=({0})}"
+                                                   Opacity="0.5" FontSize="12" />
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <DockPanel Grid.Column="1">
+
+            <!-- Header -->
+            <Border DockPanel.Dock="Top" Background="#F5F5F5" Padding="16,12"
+                    BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <!-- Book/Chapter Title -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="{Binding HebrewBookName}"
+                                   FontSize="22" FontWeight="Bold"
+                                   FontFamily="{StaticResource HebrewFont}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="פרק" VerticalAlignment="Center"
+                                   FontFamily="{StaticResource HebrewFont}" />
+                        <ComboBox ItemsSource="{Binding TotalChapters}"
+                                  SelectedIndex="{Binding CurrentChapter}"
+                                  Width="70" />
+                        <Button Content="טען" Command="{Binding LoadChapterCommand}"
+                                Padding="12,4" />
+                    </StackPanel>
+
+                    <!-- Commentary Selection -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="פרשנים:" VerticalAlignment="Center" Margin="0,0,8,0"
+                                   FontFamily="{StaticResource HebrewFont}" />
+                        <ItemsControl ItemsSource="{Binding AvailableCommentaries}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ToggleButton Content="{Binding}"
+                                                  IsChecked="{Binding $parent[UserControl].((vm:TanakhViewModel)DataContext).SelectedCommentaries, Converter={StaticResource ContainsConverter}, ConverterParameter={Binding}}"
+                                                  Command="{Binding $parent[UserControl].((vm:TanakhViewModel)DataContext).ToggleCommentaryCommand}"
+                                                  CommandParameter="{Binding}"
+                                                  Padding="8,4" Margin="2"
+                                                  FontSize="12"
+                                                  FontFamily="{StaticResource HebrewFont}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Verses -->
+            <ScrollViewer Padding="24">
+                <ItemsControl ItemsSource="{Binding Verses}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:VerseViewModel">
+                            <Border Margin="0,0,0,16" Padding="16"
+                                    Background="White" CornerRadius="8"
+                                    BorderBrush="#E8E8E8" BorderThickness="1">
+                                <StackPanel>
+                                    <!-- Verse Text -->
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Background="#E3F2FD" CornerRadius="12"
+                                                Padding="8,4" VerticalAlignment="Top">
+                                            <TextBlock Text="{Binding HebrewVerseNumber}"
+                                                       FontWeight="Bold" FontSize="14"
+                                                       FontFamily="{StaticResource HebrewFont}" />
+                                        </Border>
+                                        <TextBlock Text="{Binding HebrewText}"
+                                                   TextWrapping="Wrap"
+                                                   FontSize="20" LineHeight="36"
+                                                   FontFamily="{StaticResource HebrewFontSerif}" />
+                                    </StackPanel>
+
+                                    <!-- Commentaries -->
+                                    <ItemsControl ItemsSource="{Binding Commentaries}"
+                                                  Margin="32,12,0,0"
+                                                  IsVisible="{Binding Commentaries.Count}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Expander Margin="0,0,0,8">
+                                                    <Expander.Header>
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="#1976D2"
+                                                                   FontFamily="{StaticResource HebrewFont}" />
+                                                    </Expander.Header>
+                                                    <Border Background="#FAFAFA" Padding="12"
+                                                            CornerRadius="4" Margin="0,8,0,0">
+                                                        <TextBlock Text="{Binding Text}"
+                                                                   TextWrapping="Wrap"
+                                                                   FontSize="15" LineHeight="26"
+                                                                   FontFamily="{StaticResource HebrewFontSerif}" />
+                                                    </Border>
+                                                </Expander>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Loading Overlay -->
+            <Border DockPanel.Dock="Top" Background="#80FFFFFF"
+                    IsVisible="{Binding IsLoading}">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Width="200" />
+                    <TextBlock Text="טוען פרק..." FontSize="16" Margin="0,12,0,0"
+                               HorizontalAlignment="Center"
+                               FontFamily="{StaticResource HebrewFont}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Footer Navigation -->
+            <Border DockPanel.Dock="Bottom" Background="#F5F5F5" Padding="16,12"
+                    BorderBrush="#E0E0E0" BorderThickness="0,1,0,0">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Button Grid.Column="0" Content="◀ פרק קודם"
+                            Command="{Binding PreviousChapterCommand}"
+                            Padding="16,8" />
+
+                    <TextBlock Grid.Column="1"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontFamily="{StaticResource HebrewFont}" Opacity="0.7">
+                        <Run Text="{Binding HebrewBookName}" />
+                        <Run Text=" פרק " />
+                        <Run Text="{Binding CurrentChapter}" />
+                    </TextBlock>
+
+                    <Button Grid.Column="2" Content="פרק הבא ▶"
+                            Command="{Binding NextChapterCommand}"
+                            Padding="16,8" />
+                </Grid>
+            </Border>
+        </DockPanel>
+    </Grid>
+</UserControl>

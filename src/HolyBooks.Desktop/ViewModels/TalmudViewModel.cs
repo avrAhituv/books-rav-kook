@@ -13,10 +13,10 @@ public partial class TalmudViewModel : ObservableObject
     private readonly SefariaService _sefaria;
 
     [ObservableProperty]
-    private string _tractate = "Berakhot";
+    private string _currentTractate = "Berakhot";
 
     [ObservableProperty]
-    private string _daf = "2a";
+    private string _currentDaf = "2a";
 
     [ObservableProperty]
     private bool _isLoading;
@@ -66,7 +66,7 @@ public partial class TalmudViewModel : ObservableObject
 
         try
         {
-            var page = await _sefaria.GetTalmudPageAsync(Tractate, Daf);
+            var page = await _sefaria.GetTalmudPageAsync(CurrentTractate, CurrentDaf);
 
             if (page != null)
             {
@@ -97,10 +97,10 @@ public partial class TalmudViewModel : ObservableObject
     [RelayCommand]
     public async Task NextPage()
     {
-        var currentIndex = AvailableDafim.IndexOf(Daf);
+        var currentIndex = AvailableDafim.IndexOf(CurrentDaf);
         if (currentIndex < AvailableDafim.Count - 1)
         {
-            Daf = AvailableDafim[currentIndex + 1];
+            CurrentDaf = AvailableDafim[currentIndex + 1];
             await LoadPage();
         }
     }
@@ -108,10 +108,10 @@ public partial class TalmudViewModel : ObservableObject
     [RelayCommand]
     public async Task PreviousPage()
     {
-        var currentIndex = AvailableDafim.IndexOf(Daf);
+        var currentIndex = AvailableDafim.IndexOf(CurrentDaf);
         if (currentIndex > 0)
         {
-            Daf = AvailableDafim[currentIndex - 1];
+            CurrentDaf = AvailableDafim[currentIndex - 1];
             await LoadPage();
         }
     }
@@ -124,8 +124,8 @@ public partial class TalmudViewModel : ObservableObject
 
     private string GetHebrewTitle()
     {
-        var tractateHe = GetHebrewTractate(Tractate);
-        var dafHe = GetHebrewDaf(Daf);
+        var tractateHe = GetHebrewTractate(CurrentTractate);
+        var dafHe = GetHebrewDaf(CurrentDaf);
         return $"מסכת {tractateHe} דף {dafHe}";
     }
 

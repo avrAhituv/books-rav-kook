@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:HolyBooks.Desktop.ViewModels"
         xmlns:views="using:HolyBooks.Desktop.Views"
+        xmlns:converters="using:HolyBooks.Desktop.Converters"
         x:Class="HolyBooks.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="ספריית הקודש"
@@ -10,12 +11,19 @@
         WindowStartupLocation="CenterScreen"
         FlowDirection="RightToLeft">
 
+    <Window.Resources>
+        <converters:EqualConverter x:Key="EqualConverter" />
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:ThemeToColorConverter x:Key="ThemeToColorConverter" />
+    </Window.Resources>
+
     <Window.KeyBindings>
         <KeyBinding Gesture="Ctrl+F" Command="{Binding ToggleSearchPanelCommand}" />
         <KeyBinding Gesture="Ctrl+T" Command="{Binding OpenInNewTabCommand}" />
         <KeyBinding Gesture="Ctrl+W" Command="{Binding CloseTabCommand}" CommandParameter="{Binding SelectedTab}" />
         <KeyBinding Gesture="Ctrl+OemPlus" Command="{Binding IncreaseFontSizeCommand}" />
         <KeyBinding Gesture="Ctrl+OemMinus" Command="{Binding DecreaseFontSizeCommand}" />
+        <KeyBinding Gesture="F11" Command="{Binding ToggleFullscreenCommand}" />
     </Window.KeyBindings>
 
     <DockPanel>
@@ -25,7 +33,7 @@
                 <!-- Left: Menu -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
                     <Button Content="☰" Command="{Binding ToggleSidePanelCommand}"
-                            ToolTip.Tip="הצג/הסתר עץ ספרים"
+                            ToolTip.Tip="הצג/הסתר תפריט צד"
                             Background="Transparent" Padding="8" />
 
                     <Button Content="📥 ייבוא" Command="{Binding ImportBooksCommand}"
@@ -64,85 +72,427 @@
         <!-- Main Content -->
         <Grid ColumnDefinitions="Auto,*,Auto">
 
-            <!-- Left Sidebar: Book Tree -->
+            <!-- Left Sidebar: Navigation + Book Tree -->
             <Border Grid.Column="0" Classes="sidebar"
-                    IsVisible="{Binding IsSidePanelOpen}">
+                    IsVisible="{Binding IsSidePanelOpen}"
+                    Width="280">
                 <DockPanel>
-                    <!-- Tree Header -->
-                    <Border DockPanel.Dock="Top" Padding="12,8" Background="#EEEEEE">
-                        <TextBlock Text="ספרים" FontWeight="SemiBold"
-                                   FontFamily="{StaticResource HebrewFont}" />
+                    <!-- Main Navigation Menu -->
+                    <Border DockPanel.Dock="Top" Background="#FAFAFA" Padding="0">
+                        <StackPanel>
+                            <!-- Navigation Items -->
+                            <ListBox SelectedIndex="{Binding SelectedNavigationIndex}"
+                                     Background="Transparent"
+                                     SelectionChanged="NavigationList_SelectionChanged">
+                                <ListBox.Styles>
+                                    <Style Selector="ListBoxItem">
+                                        <Setter Property="Padding" Value="16,12" />
+                                    </Style>
+                                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="#E3F2FD" />
+                                    </Style>
+                                </ListBox.Styles>
+
+                                <ListBoxItem>
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="📚" FontSize="18" />
+                                        <TextBlock Text="כתבי הרב קוק" FontFamily="{StaticResource HebrewFont}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ListBoxItem>
+
+                                <ListBoxItem>
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="📖" FontSize="18" />
+                                        <TextBlock Text="תנ&quot;ך" FontFamily="{StaticResource HebrewFont}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ListBoxItem>
+
+                                <ListBoxItem>
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="📜" FontSize="18" />
+                                        <TextBlock Text="תלמוד בבלי" FontFamily="{StaticResource HebrewFont}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ListBoxItem>
+
+                                <ListBoxItem>
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="📝" FontSize="18" />
+                                        <TextBlock Text="דפי מקורות" FontFamily="{StaticResource HebrewFont}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ListBoxItem>
+
+                                <ListBoxItem>
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="⚙️" FontSize="18" />
+                                        <TextBlock Text="הגדרות" FontFamily="{StaticResource HebrewFont}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ListBoxItem>
+                            </ListBox>
+                        </StackPanel>
                     </Border>
 
-                    <!-- Filter -->
-                    <TextBox DockPanel.Dock="Top"
-                             Text="{Binding BookTree.FilterText}"
-                             Watermark="🔍 חפש ספר..."
-                             Classes="hebrew"
-                             Margin="8" />
+                    <Separator DockPanel.Dock="Top" Margin="12,0" />
 
-                    <!-- Tree View -->
-                    <TreeView ItemsSource="{Binding BookTree.RootNodes}"
-                              SelectedItem="{Binding BookTree.SelectedNode}">
-                        <TreeView.ItemTemplate>
-                            <TreeDataTemplate ItemsSource="{Binding Children}">
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <TextBlock Text="{Binding Icon}" />
-                                    <TextBlock Text="{Binding Title}"
-                                               FontFamily="{StaticResource HebrewFont}" />
-                                </StackPanel>
-                            </TreeDataTemplate>
-                        </TreeView.ItemTemplate>
-                    </TreeView>
+                    <!-- Book Tree (visible for Rav Kook section) -->
+                    <DockPanel IsVisible="{Binding SelectedNavigationIndex,
+                               Converter={StaticResource EqualConverter}, ConverterParameter=0}">
+                        <Border DockPanel.Dock="Top" Padding="12,8" Background="#EEEEEE">
+                            <TextBlock Text="ספרים" FontWeight="SemiBold"
+                                       FontFamily="{StaticResource HebrewFont}" />
+                        </Border>
+
+                        <TextBox DockPanel.Dock="Top"
+                                 Text="{Binding BookTree.FilterText}"
+                                 Watermark="🔍 חפש ספר..."
+                                 Classes="hebrew"
+                                 Margin="8" />
+
+                        <TreeView ItemsSource="{Binding BookTree.RootNodes}"
+                                  SelectedItem="{Binding BookTree.SelectedNode}">
+                            <TreeView.ItemTemplate>
+                                <TreeDataTemplate ItemsSource="{Binding Children}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Text="{Binding Icon}" />
+                                        <TextBlock Text="{Binding Title}"
+                                                   FontFamily="{StaticResource HebrewFont}" />
+                                    </StackPanel>
+                                </TreeDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </DockPanel>
+
+                    <!-- Tanakh Book Selection (visible for Tanakh section) -->
+                    <DockPanel IsVisible="{Binding SelectedNavigationIndex,
+                               Converter={StaticResource EqualConverter}, ConverterParameter=1}">
+                        <Border DockPanel.Dock="Top" Padding="12,8" Background="#EEEEEE">
+                            <TextBlock Text="ספרי התנ&quot;ך" FontWeight="SemiBold"
+                                       FontFamily="{StaticResource HebrewFont}" />
+                        </Border>
+
+                        <ScrollViewer>
+                            <StackPanel Margin="8">
+                                <!-- Torah -->
+                                <TextBlock Text="תורה" FontWeight="SemiBold" Margin="0,8,0,4"
+                                           FontFamily="{StaticResource HebrewFont}" />
+                                <WrapPanel>
+                                    <Button Content="בראשית" Tag="Genesis" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Genesis" />
+                                    <Button Content="שמות" Tag="Exodus" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Exodus" />
+                                    <Button Content="ויקרא" Tag="Leviticus" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Leviticus" />
+                                    <Button Content="במדבר" Tag="Numbers" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Numbers" />
+                                    <Button Content="דברים" Tag="Deuteronomy" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Deuteronomy" />
+                                </WrapPanel>
+
+                                <!-- Prophets -->
+                                <TextBlock Text="נביאים" FontWeight="SemiBold" Margin="0,12,0,4"
+                                           FontFamily="{StaticResource HebrewFont}" />
+                                <WrapPanel>
+                                    <Button Content="יהושע" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Joshua" />
+                                    <Button Content="שופטים" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Judges" />
+                                    <Button Content="שמואל א" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="I Samuel" />
+                                    <Button Content="שמואל ב" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="II Samuel" />
+                                    <Button Content="מלכים א" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="I Kings" />
+                                    <Button Content="מלכים ב" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="II Kings" />
+                                    <Button Content="ישעיהו" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Isaiah" />
+                                    <Button Content="ירמיהו" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Jeremiah" />
+                                    <Button Content="יחזקאל" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Ezekiel" />
+                                    <Button Content="תרי עשר" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Hosea" />
+                                </WrapPanel>
+
+                                <!-- Writings -->
+                                <TextBlock Text="כתובים" FontWeight="SemiBold" Margin="0,12,0,4"
+                                           FontFamily="{StaticResource HebrewFont}" />
+                                <WrapPanel>
+                                    <Button Content="תהלים" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Psalms" />
+                                    <Button Content="משלי" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Proverbs" />
+                                    <Button Content="איוב" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Job" />
+                                    <Button Content="שיר השירים" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Song of Songs" />
+                                    <Button Content="רות" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Ruth" />
+                                    <Button Content="איכה" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Lamentations" />
+                                    <Button Content="קהלת" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Ecclesiastes" />
+                                    <Button Content="אסתר" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Esther" />
+                                    <Button Content="דניאל" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Daniel" />
+                                    <Button Content="עזרא" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Ezra" />
+                                    <Button Content="נחמיה" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="Nehemiah" />
+                                    <Button Content="דברי הימים" Classes="book-button"
+                                            Command="{Binding OpenTanakhBookCommand}" CommandParameter="I Chronicles" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
+
+                    <!-- Talmud Tractate Selection (visible for Talmud section) -->
+                    <DockPanel IsVisible="{Binding SelectedNavigationIndex,
+                               Converter={StaticResource EqualConverter}, ConverterParameter=2}">
+                        <Border DockPanel.Dock="Top" Padding="12,8" Background="#EEEEEE">
+                            <TextBlock Text="מסכתות" FontWeight="SemiBold"
+                                       FontFamily="{StaticResource HebrewFont}" />
+                        </Border>
+
+                        <ScrollViewer>
+                            <StackPanel Margin="8">
+                                <!-- Seder Zeraim -->
+                                <TextBlock Text="סדר זרעים" FontWeight="SemiBold" Margin="0,8,0,4"
+                                           FontFamily="{StaticResource HebrewFont}" Foreground="#1976D2" />
+                                <WrapPanel>
+                                    <Button Content="ברכות" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Berakhot" />
+                                </WrapPanel>
+
+                                <!-- Seder Moed -->
+                                <TextBlock Text="סדר מועד" FontWeight="SemiBold" Margin="0,12,0,4"
+                                           FontFamily="{StaticResource HebrewFont}" Foreground="#1976D2" />
+                                <WrapPanel>
+                                    <Button Content="שבת" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Shabbat" />
+                                    <Button Content="עירובין" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Eruvin" />
+                                    <Button Content="פסחים" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Pesachim" />
+                                    <Button Content="יומא" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Yoma" />
+                                    <Button Content="סוכה" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Sukkah" />
+                                    <Button Content="ביצה" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Beitzah" />
+                                    <Button Content="ראש השנה" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Rosh Hashanah" />
+                                    <Button Content="תענית" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Taanit" />
+                                    <Button Content="מגילה" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Megillah" />
+                                    <Button Content="מועד קטן" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Moed Katan" />
+                                    <Button Content="חגיגה" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Chagigah" />
+                                </WrapPanel>
+
+                                <!-- Seder Nashim -->
+                                <TextBlock Text="סדר נשים" FontWeight="SemiBold" Margin="0,12,0,4"
+                                           FontFamily="{StaticResource HebrewFont}" Foreground="#1976D2" />
+                                <WrapPanel>
+                                    <Button Content="יבמות" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Yevamot" />
+                                    <Button Content="כתובות" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Ketubot" />
+                                    <Button Content="נדרים" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Nedarim" />
+                                    <Button Content="נזיר" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Nazir" />
+                                    <Button Content="סוטה" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Sotah" />
+                                    <Button Content="גיטין" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Gittin" />
+                                    <Button Content="קידושין" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Kiddushin" />
+                                </WrapPanel>
+
+                                <!-- Seder Nezikin -->
+                                <TextBlock Text="סדר נזיקין" FontWeight="SemiBold" Margin="0,12,0,4"
+                                           FontFamily="{StaticResource HebrewFont}" Foreground="#1976D2" />
+                                <WrapPanel>
+                                    <Button Content="בבא קמא" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Bava Kamma" />
+                                    <Button Content="בבא מציעא" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Bava Metzia" />
+                                    <Button Content="בבא בתרא" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Bava Batra" />
+                                    <Button Content="סנהדרין" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Sanhedrin" />
+                                    <Button Content="מכות" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Makkot" />
+                                    <Button Content="שבועות" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Shevuot" />
+                                    <Button Content="עבודה זרה" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Avodah Zarah" />
+                                    <Button Content="הוריות" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Horayot" />
+                                </WrapPanel>
+
+                                <!-- Seder Kodashim -->
+                                <TextBlock Text="סדר קדשים" FontWeight="SemiBold" Margin="0,12,0,4"
+                                           FontFamily="{StaticResource HebrewFont}" Foreground="#1976D2" />
+                                <WrapPanel>
+                                    <Button Content="זבחים" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Zevachim" />
+                                    <Button Content="מנחות" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Menachot" />
+                                    <Button Content="חולין" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Chullin" />
+                                    <Button Content="בכורות" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Bekhorot" />
+                                    <Button Content="ערכין" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Arakhin" />
+                                    <Button Content="תמורה" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Temurah" />
+                                    <Button Content="כריתות" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Keritot" />
+                                    <Button Content="מעילה" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Meilah" />
+                                </WrapPanel>
+
+                                <!-- Seder Taharot -->
+                                <TextBlock Text="סדר טהרות" FontWeight="SemiBold" Margin="0,12,0,4"
+                                           FontFamily="{StaticResource HebrewFont}" Foreground="#1976D2" />
+                                <WrapPanel>
+                                    <Button Content="נידה" Classes="book-button"
+                                            Command="{Binding OpenTalmudTractateCommand}" CommandParameter="Niddah" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </DockPanel>
+
+                    <!-- Source Sheets (visible for Source Sheets section) -->
+                    <DockPanel IsVisible="{Binding SelectedNavigationIndex,
+                               Converter={StaticResource EqualConverter}, ConverterParameter=3}">
+                        <Border DockPanel.Dock="Top" Padding="12,8" Background="#EEEEEE">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="דפי מקורות" FontWeight="SemiBold"
+                                           FontFamily="{StaticResource HebrewFont}" />
+                                <Button Grid.Column="1" Content="+ חדש"
+                                        Command="{Binding CreateNewSourceSheetCommand}"
+                                        Padding="8,4" FontSize="12" />
+                            </Grid>
+                        </Border>
+
+                        <ListBox ItemsSource="{Binding SourceSheets}"
+                                 SelectedItem="{Binding SelectedSourceSheet}"
+                                 Background="Transparent">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="12,8" Cursor="Hand">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold"
+                                                       FontFamily="{StaticResource HebrewFont}" />
+                                            <TextBlock Text="{Binding Description}" FontSize="12"
+                                                       Opacity="0.7" TextTrimming="CharacterEllipsis"
+                                                       FontFamily="{StaticResource HebrewFont}" />
+                                            <TextBlock FontSize="11" Opacity="0.5" Margin="0,4,0,0"
+                                                       FontFamily="{StaticResource HebrewFont}">
+                                                <Run Text="{Binding ItemCount}" />
+                                                <Run Text="פריטים" />
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+
+                    <!-- Settings placeholder in sidebar -->
+                    <DockPanel IsVisible="{Binding SelectedNavigationIndex,
+                               Converter={StaticResource EqualConverter}, ConverterParameter=4}">
+                        <TextBlock Text="הגדרות מוצגות באזור הראשי"
+                                   FontFamily="{StaticResource HebrewFont}"
+                                   Opacity="0.6" Margin="16"
+                                   TextWrapping="Wrap" />
+                    </DockPanel>
                 </DockPanel>
             </Border>
 
-            <!-- Main: Reader with Tabs -->
+            <!-- Main Content Area -->
             <DockPanel Grid.Column="1">
-                <!-- Tab Strip -->
-                <TabControl DockPanel.Dock="Top"
-                            ItemsSource="{Binding OpenTabs}"
-                            SelectedItem="{Binding SelectedTab}">
-                    <TabControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:TabItemViewModel">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="{Binding Title}"
-                                           FontFamily="{StaticResource HebrewFont}"
-                                           MaxWidth="150" TextTrimming="CharacterEllipsis" />
-                                <Button Content="✕" FontSize="10"
-                                        Background="Transparent" Padding="4,2"
-                                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CloseTabCommand}"
-                                        CommandParameter="{Binding}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </TabControl.ItemTemplate>
-                    <TabControl.ContentTemplate>
-                        <DataTemplate x:DataType="vm:TabItemViewModel">
-                            <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                                          VerticalScrollBarVisibility="Auto"
-                                          Padding="24">
-                                <StackPanel MaxWidth="800" HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding Title}"
-                                               Classes="heading" />
-                                    <TextBlock Text="{Binding Content}"
-                                               Classes="reader"
-                                               FontSize="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).FontSize}" />
-                                </StackPanel>
-                            </ScrollViewer>
-                        </DataTemplate>
-                    </TabControl.ContentTemplate>
-                </TabControl>
+                <!-- Content based on selected section -->
+                <Grid>
+                    <!-- Rav Kook Books: Tabs -->
+                    <DockPanel IsVisible="{Binding SelectedNavigationIndex,
+                               Converter={StaticResource EqualConverter}, ConverterParameter=0}">
+                        <TabControl DockPanel.Dock="Top"
+                                    ItemsSource="{Binding OpenTabs}"
+                                    SelectedItem="{Binding SelectedTab}"
+                                    IsVisible="{Binding OpenTabs.Count}">
+                            <TabControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:TabItemViewModel">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{Binding Title}"
+                                                   FontFamily="{StaticResource HebrewFont}"
+                                                   MaxWidth="150" TextTrimming="CharacterEllipsis" />
+                                        <Button Content="✕" FontSize="10"
+                                                Background="Transparent" Padding="4,2"
+                                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).CloseTabCommand}"
+                                                CommandParameter="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </TabControl.ItemTemplate>
+                            <TabControl.ContentTemplate>
+                                <DataTemplate x:DataType="vm:TabItemViewModel">
+                                    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                                  VerticalScrollBarVisibility="Auto"
+                                                  Padding="24">
+                                        <StackPanel MaxWidth="800" HorizontalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}"
+                                                       Classes="heading" />
+                                            <TextBlock Text="{Binding Content}"
+                                                       Classes="reader"
+                                                       FontSize="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).FontSize}" />
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </DataTemplate>
+                            </TabControl.ContentTemplate>
+                        </TabControl>
 
-                <!-- Empty State -->
-                <Border IsVisible="{Binding !OpenTabs.Count}">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
-                        <TextBlock Text="📚" FontSize="64" HorizontalAlignment="Center" />
-                        <TextBlock Text="בחר ספר מהרשימה כדי להתחיל לקרוא"
-                                   FontSize="18" Opacity="0.6"
-                                   FontFamily="{StaticResource HebrewFont}"
-                                   HorizontalAlignment="Center" />
-                    </StackPanel>
-                </Border>
+                        <!-- Empty State for Rav Kook -->
+                        <Border IsVisible="{Binding !OpenTabs.Count}">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
+                                <TextBlock Text="📚" FontSize="64" HorizontalAlignment="Center" />
+                                <TextBlock Text="בחר ספר מהרשימה כדי להתחיל לקרוא"
+                                           FontSize="18" Opacity="0.6"
+                                           FontFamily="{StaticResource HebrewFont}"
+                                           HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </DockPanel>
+
+                    <!-- Tanakh View -->
+                    <views:TanakhView IsVisible="{Binding SelectedNavigationIndex,
+                                      Converter={StaticResource EqualConverter}, ConverterParameter=1}"
+                                      DataContext="{Binding TanakhViewModel}" />
+
+                    <!-- Talmud View -->
+                    <views:TalmudPageView IsVisible="{Binding SelectedNavigationIndex,
+                                          Converter={StaticResource EqualConverter}, ConverterParameter=2}"
+                                          DataContext="{Binding TalmudViewModel}" />
+
+                    <!-- Source Sheet Editor -->
+                    <views:SourceSheetEditorView IsVisible="{Binding SelectedNavigationIndex,
+                                                 Converter={StaticResource EqualConverter}, ConverterParameter=3}"
+                                                 DataContext="{Binding SourceSheetEditorViewModel}" />
+
+                    <!-- Settings View -->
+                    <views:SettingsView IsVisible="{Binding SelectedNavigationIndex,
+                                        Converter={StaticResource EqualConverter}, ConverterParameter=4}"
+                                        DataContext="{Binding SettingsViewModel}" />
+                </Grid>
             </DockPanel>
 
             <!-- Right Panel: Search (Overlay) -->
@@ -176,7 +526,7 @@
                         <!-- Filters -->
                         <WrapPanel Margin="0,8,0,0">
                             <CheckBox Content="רב קוק" IsChecked="{Binding Search.SearchInRavKook}" Margin="0,0,12,0" />
-                            <CheckBox Content="תנ״ך" IsChecked="{Binding Search.SearchInTanakh}" Margin="0,0,12,0" />
+                            <CheckBox Content="תנ&quot;ך" IsChecked="{Binding Search.SearchInTanakh}" Margin="0,0,12,0" />
                             <CheckBox Content="תלמוד" IsChecked="{Binding Search.SearchInTalmud}" />
                         </WrapPanel>
 

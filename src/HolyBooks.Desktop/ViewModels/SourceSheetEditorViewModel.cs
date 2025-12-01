@@ -61,6 +61,8 @@ public partial class SourceSheetEditorViewModel : ObservableObject
         Items.CollectionChanged += (_, _) => IsDirty = true;
     }
 
+    public async Task LoadSheetAsync(int sheetId) => await LoadSheet(sheetId);
+
     [RelayCommand]
     public async Task LoadSheet(int sheetId)
     {

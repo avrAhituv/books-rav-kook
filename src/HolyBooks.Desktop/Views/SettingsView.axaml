@@ -1,0 +1,261 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:HolyBooks.Desktop.ViewModels"
+             x:Class="HolyBooks.Desktop.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel"
+             FlowDirection="RightToLeft">
+
+    <ScrollViewer Padding="24">
+        <StackPanel MaxWidth="600" Spacing="24">
+
+            <!-- Header -->
+            <TextBlock Text="הגדרות" FontSize="28" FontWeight="Bold"
+                       FontFamily="{StaticResource HebrewFont}" />
+
+            <!-- Appearance Section -->
+            <Border Classes="card">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="מראה" FontSize="18" FontWeight="SemiBold"
+                               FontFamily="{StaticResource HebrewFont}" />
+
+                    <!-- Theme -->
+                    <Grid ColumnDefinitions="*,200">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="ערכת נושא" FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock Text="בחר בין מצב בהיר, כהה או ספיה"
+                                       FontSize="12" Opacity="0.6"
+                                       FontFamily="{StaticResource HebrewFont}" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedItem="{Binding Theme}">
+                            <ComboBoxItem Content="בהיר" Tag="light" />
+                            <ComboBoxItem Content="כהה" Tag="dark" />
+                            <ComboBoxItem Content="ספיה" Tag="sepia" />
+                        </ComboBox>
+                    </Grid>
+
+                    <Separator />
+
+                    <!-- Font Size -->
+                    <Grid ColumnDefinitions="*,200">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="גודל גופן" FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock FontSize="12" Opacity="0.6"
+                                       FontFamily="{StaticResource HebrewFont}">
+                                <Run Text="נוכחי:" />
+                                <Run Text="{Binding FontSize}" />
+                            </TextBlock>
+                        </StackPanel>
+                        <Slider Grid.Column="1" Minimum="12" Maximum="32"
+                                Value="{Binding FontSize}"
+                                TickFrequency="2" IsSnapToTickEnabled="True" />
+                    </Grid>
+
+                    <Separator />
+
+                    <!-- Font Family -->
+                    <Grid ColumnDefinitions="*,200">
+                        <TextBlock Text="גופן" FontFamily="{StaticResource HebrewFont}" />
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding AvailableFonts}"
+                                  SelectedItem="{Binding FontFamily}" />
+                    </Grid>
+
+                    <Separator />
+
+                    <!-- Line Height -->
+                    <Grid ColumnDefinitions="*,200">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="גובה שורה" FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock FontSize="12" Opacity="0.6"
+                                       FontFamily="{StaticResource HebrewFont}">
+                                <Run Text="נוכחי:" />
+                                <Run Text="{Binding LineHeight, StringFormat={}{0:F1}}" />
+                            </TextBlock>
+                        </StackPanel>
+                        <Slider Grid.Column="1" Minimum="1.2" Maximum="2.5"
+                                Value="{Binding LineHeight}"
+                                TickFrequency="0.1" IsSnapToTickEnabled="True" />
+                    </Grid>
+
+                    <Separator />
+
+                    <!-- Text Width -->
+                    <Grid ColumnDefinitions="*,200">
+                        <TextBlock Text="רוחב טקסט" FontFamily="{StaticResource HebrewFont}" />
+                        <ComboBox Grid.Column="1" SelectedItem="{Binding TextWidth}">
+                            <ComboBoxItem Content="צר" Tag="narrow" />
+                            <ComboBoxItem Content="בינוני" Tag="medium" />
+                            <ComboBoxItem Content="רחב" Tag="wide" />
+                        </ComboBox>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Reading Section -->
+            <Border Classes="card">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="קריאה" FontSize="18" FontWeight="SemiBold"
+                               FontFamily="{StaticResource HebrewFont}" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="הצג מספרי פסוקים" FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock Text="הצג מספרים בצד הפסוקים בתנ&quot;ך"
+                                       FontSize="12" Opacity="0.6"
+                                       FontFamily="{StaticResource HebrewFont}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowVerseNumbers}" />
+                    </Grid>
+
+                    <Separator />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="הדגש תוצאות חיפוש" FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock Text="הדגש את מילות החיפוש בטקסט"
+                                       FontSize="12" Opacity="0.6"
+                                       FontFamily="{StaticResource HebrewFont}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding HighlightSearchResults}" />
+                    </Grid>
+
+                    <Separator />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="שמירת סשן אוטומטית" FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock Text="שמור את הטאבים הפתוחים ביציאה"
+                                       FontSize="12" Opacity="0.6"
+                                       FontFamily="{StaticResource HebrewFont}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoSaveSession}" />
+                    </Grid>
+
+                    <Separator />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="זכור מיקום קריאה" FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock Text="חזור למיקום האחרון בפתיחת ספר"
+                                       FontSize="12" Opacity="0.6"
+                                       FontFamily="{StaticResource HebrewFont}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsChecked="{Binding RememberLastPosition}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Data Section -->
+            <Border Classes="card">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="נתונים" FontSize="18" FontWeight="SemiBold"
+                               FontFamily="{StaticResource HebrewFont}" />
+
+                    <!-- Cache Info -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="מטמון (Cache)" FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock FontSize="12" Opacity="0.6"
+                                       FontFamily="{StaticResource HebrewFont}">
+                                <Run Text="{Binding CachedTextsCount}" />
+                                <Run Text="טקסטים שמורים (" />
+                                <Run Text="{Binding CacheSize}" />
+                                <Run Text=")" />
+                            </TextBlock>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="נקה מטמון"
+                                Command="{Binding ClearCacheCommand}"
+                                Padding="16,8" />
+                    </Grid>
+
+                    <Separator />
+
+                    <!-- Reading History -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="היסטוריית קריאה" FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock Text="מחק את כל היסטוריית המיקומים"
+                                       FontSize="12" Opacity="0.6"
+                                       FontFamily="{StaticResource HebrewFont}" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="נקה היסטוריה"
+                                Command="{Binding ClearReadingHistoryCommand}"
+                                Padding="16,8" />
+                    </Grid>
+
+                    <Separator />
+
+                    <!-- Export/Import -->
+                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                        <Button Content="📤 ייצוא נתונים" Command="{Binding ExportDataCommand}"
+                                Padding="16,8" />
+                        <Button Content="📥 ייבוא נתונים" Command="{Binding ImportDataCommand}"
+                                Padding="16,8" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- About Section -->
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="אודות" FontSize="18" FontWeight="SemiBold"
+                               FontFamily="{StaticResource HebrewFont}" />
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="ספריית הקודש" FontSize="16" FontWeight="SemiBold"
+                                   FontFamily="{StaticResource HebrewFont}" />
+                        <TextBlock FontFamily="{StaticResource HebrewFont}" Opacity="0.7">
+                            <Run Text="גרסה" />
+                            <Run Text="{Binding Version}" />
+                        </TextBlock>
+                    </StackPanel>
+
+                    <TextBlock Text="אפליקציה לקריאה ולימוד ספרי קודש, כולל כתבי הרב קוק, תנ&quot;ך עם פרשנים ותלמוד בבלי."
+                               TextWrapping="Wrap" Opacity="0.8"
+                               FontFamily="{StaticResource HebrewFont}" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,8,0,0">
+                        <Button Content="🌐 אתר" Padding="12,6" Background="Transparent" />
+                        <Button Content="📧 יצירת קשר" Padding="12,6" Background="Transparent" />
+                        <Button Content="⭐ GitHub" Padding="12,6" Background="Transparent" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Keyboard Shortcuts -->
+            <Border Classes="card">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="קיצורי מקלדת" FontSize="18" FontWeight="SemiBold"
+                               FontFamily="{StaticResource HebrewFont}" />
+
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="חיפוש" FontFamily="{StaticResource HebrewFont}" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="Ctrl+F" Opacity="0.7" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="טאב חדש" FontFamily="{StaticResource HebrewFont}" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Ctrl+T" Opacity="0.7" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="סגור טאב" FontFamily="{StaticResource HebrewFont}" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="Ctrl+W" Opacity="0.7" />
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="הגדל גופן" FontFamily="{StaticResource HebrewFont}" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="Ctrl++" Opacity="0.7" />
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="הקטן גופן" FontFamily="{StaticResource HebrewFont}" />
+                        <TextBlock Grid.Row="4" Grid.Column="1" Text="Ctrl+-" Opacity="0.7" />
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="סימניה חדשה" FontFamily="{StaticResource HebrewFont}" />
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="Ctrl+D" Opacity="0.7" />
+
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="הערה חדשה" FontFamily="{StaticResource HebrewFont}" />
+                        <TextBlock Grid.Row="6" Grid.Column="1" Text="Ctrl+M" Opacity="0.7" />
+
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="מסך מלא" FontFamily="{StaticResource HebrewFont}" />
+                        <TextBlock Grid.Row="7" Grid.Column="1" Text="F11" Opacity="0.7" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

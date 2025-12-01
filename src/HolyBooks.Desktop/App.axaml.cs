@@ -3,7 +3,10 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using HolyBooks.Desktop.Views;
 using HolyBooks.Desktop.ViewModels;
+using HolyBooks.Desktop.Services;
 using HolyBooks.Data.Database;
+using HolyBooks.Data.Search;
+using HolyBooks.Data.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HolyBooks.Desktop;
@@ -47,10 +50,19 @@ public partial class App : Application
         // Database
         services.AddDbContext<AppDbContext>();
 
+        // Services
+        services.AddSingleton<SefariaService>();
+        services.AddSingleton<LuceneSearchService>();
+        services.AddSingleton<ExportService>();
+
         // ViewModels
         services.AddTransient<MainWindowViewModel>();
         services.AddTransient<BookTreeViewModel>();
         services.AddTransient<ReaderViewModel>();
         services.AddTransient<SearchViewModel>();
+        services.AddTransient<TanakhViewModel>();
+        services.AddTransient<TalmudViewModel>();
+        services.AddTransient<SourceSheetEditorViewModel>();
+        services.AddTransient<SettingsViewModel>();
     }
 }
