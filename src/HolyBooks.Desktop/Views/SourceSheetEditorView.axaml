@@ -1,0 +1,295 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:HolyBooks.Desktop.ViewModels"
+             x:Class="HolyBooks.Desktop.Views.SourceSheetEditorView"
+             x:DataType="vm:SourceSheetEditorViewModel"
+             FlowDirection="RightToLeft">
+
+    <Grid ColumnDefinitions="300,*,300">
+
+        <!-- Left Panel: Add Components -->
+        <Border Grid.Column="0" Background="#F5F5F5"
+                BorderBrush="#E0E0E0" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <!-- Header -->
+                <Border DockPanel.Dock="Top" Background="#EEEEEE" Padding="12,8">
+                    <TextBlock Text="רכיבים" FontWeight="SemiBold"
+                               FontFamily="{StaticResource HebrewFont}" />
+                </Border>
+
+                <!-- Add Buttons -->
+                <StackPanel DockPanel.Dock="Top" Margin="12" Spacing="8">
+                    <Button Content="+ כותרת" Command="{Binding AddHeadingCommand}"
+                            HorizontalAlignment="Stretch" Padding="12,8" />
+                    <Button Content="+ טקסט חופשי" Command="{Binding AddTextCommand}"
+                            HorizontalAlignment="Stretch" Padding="12,8" />
+                    <Button Content="+ קו מפריד" Command="{Binding AddDividerCommand}"
+                            HorizontalAlignment="Stretch" Padding="12,8" />
+                </StackPanel>
+
+                <Separator DockPanel.Dock="Top" Margin="12,0" />
+
+                <!-- Search -->
+                <StackPanel DockPanel.Dock="Top" Margin="12" Spacing="8">
+                    <TextBlock Text="חיפוש מקור" FontWeight="SemiBold"
+                               FontFamily="{StaticResource HebrewFont}" />
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox Text="{Binding SearchQuery}"
+                                 Watermark="חפש בספרים..."
+                                 Classes="hebrew" />
+                        <Button Grid.Column="1" Content="🔍"
+                                Command="{Binding SearchCommand}"
+                                Margin="8,0,0,0" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- Search Results -->
+                <ListBox ItemsSource="{Binding SearchResults}"
+                         Margin="0,0,0,8">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="8" Background="White" Margin="4"
+                                    CornerRadius="4" BorderBrush="#E0E0E0" BorderThickness="1"
+                                    PointerPressed="SearchResult_PointerPressed">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="{Binding HebrewRef}"
+                                               FontWeight="SemiBold" FontSize="13"
+                                               Foreground="#1976D2"
+                                               FontFamily="{StaticResource HebrewFont}" />
+                                    <TextBlock Text="{Binding Text}"
+                                               TextWrapping="Wrap" MaxLines="2"
+                                               FontSize="12" Opacity="0.8"
+                                               FontFamily="{StaticResource HebrewFont}" />
+                                    <Button Content="+ הוסף"
+                                            Command="{Binding $parent[UserControl].((vm:SourceSheetEditorViewModel)DataContext).AddSourceFromSearchCommand}"
+                                            CommandParameter="{Binding}"
+                                            HorizontalAlignment="Left" Padding="8,2"
+                                            FontSize="11" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- Center: Sheet Content -->
+        <DockPanel Grid.Column="1">
+            <!-- Title Bar -->
+            <Border DockPanel.Dock="Top" Padding="16" Background="White"
+                    BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                <StackPanel Spacing="8">
+                    <TextBox Text="{Binding Title}"
+                             FontSize="24" FontWeight="Bold"
+                             BorderThickness="0" Background="Transparent"
+                             FontFamily="{StaticResource HebrewFont}"
+                             Watermark="כותרת דף המקורות" />
+                    <TextBox Text="{Binding Description}"
+                             FontSize="14" Opacity="0.7"
+                             BorderThickness="0" Background="Transparent"
+                             FontFamily="{StaticResource HebrewFont}"
+                             Watermark="תיאור (אופציונלי)" />
+
+                    <!-- Tags -->
+                    <WrapPanel>
+                        <ItemsControl ItemsSource="{Binding Tags}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#E3F2FD" CornerRadius="12"
+                                            Padding="8,4" Margin="0,0,4,4">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <TextBlock Text="{Binding}" FontSize="12"
+                                                       FontFamily="{StaticResource HebrewFont}" />
+                                            <Button Content="✕" FontSize="10"
+                                                    Background="Transparent" Padding="2"
+                                                    Command="{Binding $parent[UserControl].((vm:SourceSheetEditorViewModel)DataContext).RemoveTagCommand}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBox Text="{Binding NewTag}" Width="100"
+                                     Watermark="תגית..." FontSize="12" Padding="4" />
+                            <Button Content="+" Command="{Binding AddTagCommand}"
+                                    Padding="6,2" />
+                        </StackPanel>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Items List -->
+            <ScrollViewer Padding="16">
+                <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SheetItemViewModel">
+                            <Border Background="White" CornerRadius="8"
+                                    BorderBrush="#E0E0E0" BorderThickness="1"
+                                    Margin="0,0,0,12" Padding="16">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <!-- Drag Handle -->
+                                    <TextBlock Grid.Column="0" Text="≡"
+                                               FontSize="20" Opacity="0.3"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,12,0"
+                                               Cursor="SizeAll" />
+
+                                    <!-- Content -->
+                                    <StackPanel Grid.Column="1" Spacing="8">
+                                        <!-- Type indicator -->
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <TextBlock Text="{Binding Icon}" />
+                                            <TextBlock Text="{Binding ItemType}"
+                                                       FontSize="12" Opacity="0.5" />
+                                        </StackPanel>
+
+                                        <!-- Heading -->
+                                        <TextBox Text="{Binding CustomText}"
+                                                 IsVisible="{Binding ItemType, Converter={StaticResource EqualConverter}, ConverterParameter=heading}"
+                                                 FontSize="20" FontWeight="Bold"
+                                                 FontFamily="{StaticResource HebrewFont}" />
+
+                                        <!-- Text -->
+                                        <TextBox Text="{Binding CustomText}"
+                                                 IsVisible="{Binding ItemType, Converter={StaticResource EqualConverter}, ConverterParameter=text}"
+                                                 TextWrapping="Wrap" AcceptsReturn="True"
+                                                 MinHeight="60"
+                                                 FontFamily="{StaticResource HebrewFont}" />
+
+                                        <!-- Source -->
+                                        <StackPanel IsVisible="{Binding ItemType, Converter={StaticResource EqualConverter}, ConverterParameter=source}">
+                                            <TextBlock Text="{Binding SourceRef}"
+                                                       FontWeight="SemiBold" FontSize="14"
+                                                       Foreground="#1976D2"
+                                                       FontFamily="{StaticResource HebrewFont}" />
+                                            <Border Background="#FAFAFA" CornerRadius="4"
+                                                    Padding="12" Margin="0,8,0,0">
+                                                <TextBlock Text="{Binding SourceText}"
+                                                           TextWrapping="Wrap"
+                                                           FontSize="16" LineHeight="28"
+                                                           FontFamily="{StaticResource HebrewFontSerif}" />
+                                            </Border>
+                                        </StackPanel>
+
+                                        <!-- Divider -->
+                                        <Separator IsVisible="{Binding ItemType, Converter={StaticResource EqualConverter}, ConverterParameter=divider}"
+                                                   Height="2" Margin="0,8" />
+
+                                        <!-- Note -->
+                                        <Expander Header="הערה" IsVisible="{Binding ItemType, Converter={StaticResource NotEqualConverter}, ConverterParameter=divider}">
+                                            <TextBox Text="{Binding Note}"
+                                                     Watermark="הוסף הערה..."
+                                                     TextWrapping="Wrap"
+                                                     FontFamily="{StaticResource HebrewFont}"
+                                                     Margin="0,8,0,0" />
+                                        </Expander>
+                                    </StackPanel>
+
+                                    <!-- Actions -->
+                                    <StackPanel Grid.Column="2" Spacing="4">
+                                        <Button Content="▲" ToolTip.Tip="הזז למעלה"
+                                                Command="{Binding $parent[UserControl].((vm:SourceSheetEditorViewModel)DataContext).MoveItemUpCommand}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" Padding="4" />
+                                        <Button Content="▼" ToolTip.Tip="הזז למטה"
+                                                Command="{Binding $parent[UserControl].((vm:SourceSheetEditorViewModel)DataContext).MoveItemDownCommand}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" Padding="4" />
+                                        <Button Content="📋" ToolTip.Tip="שכפל"
+                                                Command="{Binding $parent[UserControl].((vm:SourceSheetEditorViewModel)DataContext).DuplicateItemCommand}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" Padding="4" />
+                                        <Button Content="🗑" ToolTip.Tip="מחק"
+                                                Command="{Binding $parent[UserControl].((vm:SourceSheetEditorViewModel)DataContext).RemoveItemCommand}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" Padding="4"
+                                                Foreground="#D32F2F" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Save Button -->
+            <Border DockPanel.Dock="Bottom" Background="#F5F5F5" Padding="16"
+                    BorderBrush="#E0E0E0" BorderThickness="0,1,0,0">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding IsDirty, Converter={StaticResource DirtyTextConverter}}"
+                               VerticalAlignment="Center" Opacity="0.6"
+                               FontFamily="{StaticResource HebrewFont}" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <Button Content="📤 ייצוא" Padding="16,8" />
+                        <Button Content="💾 שמור" Command="{Binding SaveCommand}"
+                                Classes="primary" Padding="16,8"
+                                IsEnabled="{Binding IsDirty}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DockPanel>
+
+        <!-- Right Panel: Preview -->
+        <Border Grid.Column="2" Background="White"
+                BorderBrush="#E0E0E0" BorderThickness="1,0,0,0">
+            <DockPanel>
+                <Border DockPanel.Dock="Top" Background="#EEEEEE" Padding="12,8">
+                    <TextBlock Text="תצוגה מקדימה" FontWeight="SemiBold"
+                               FontFamily="{StaticResource HebrewFont}" />
+                </Border>
+
+                <ScrollViewer Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="{Binding Title}"
+                                   FontSize="22" FontWeight="Bold"
+                                   TextAlignment="Center"
+                                   FontFamily="{StaticResource HebrewFont}" />
+
+                        <ItemsControl ItemsSource="{Binding Items}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SheetItemViewModel">
+                                    <StackPanel Margin="0,0,0,12">
+                                        <!-- Heading -->
+                                        <TextBlock Text="{Binding CustomText}"
+                                                   IsVisible="{Binding ItemType, Converter={StaticResource EqualConverter}, ConverterParameter=heading}"
+                                                   FontSize="16" FontWeight="Bold"
+                                                   FontFamily="{StaticResource HebrewFont}" />
+
+                                        <!-- Text -->
+                                        <TextBlock Text="{Binding CustomText}"
+                                                   IsVisible="{Binding ItemType, Converter={StaticResource EqualConverter}, ConverterParameter=text}"
+                                                   TextWrapping="Wrap"
+                                                   FontFamily="{StaticResource HebrewFont}" />
+
+                                        <!-- Source -->
+                                        <Border IsVisible="{Binding ItemType, Converter={StaticResource EqualConverter}, ConverterParameter=source}"
+                                                BorderBrush="#E0E0E0" BorderThickness="0,0,3,0"
+                                                Padding="8,4">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding SourceRef}"
+                                                           FontSize="11" Foreground="#1976D2"
+                                                           FontFamily="{StaticResource HebrewFont}" />
+                                                <TextBlock Text="{Binding SourceText}"
+                                                           TextWrapping="Wrap" FontSize="13"
+                                                           FontFamily="{StaticResource HebrewFontSerif}" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Divider -->
+                                        <Separator IsVisible="{Binding ItemType, Converter={StaticResource EqualConverter}, ConverterParameter=divider}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

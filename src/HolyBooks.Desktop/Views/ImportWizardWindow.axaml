@@ -1,0 +1,195 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:HolyBooks.Desktop.ViewModels"
+        x:Class="HolyBooks.Desktop.Views.ImportWizardWindow"
+        x:DataType="vm:ImportWizardViewModel"
+        Title="ייבוא ספרים"
+        Width="900" Height="650"
+        WindowStartupLocation="CenterOwner"
+        FlowDirection="RightToLeft"
+        CanResize="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Header with Steps -->
+        <Border Grid.Row="0" Background="#1976D2" Padding="24,16">
+            <StackPanel>
+                <TextBlock Text="אשף ייבוא ספרים"
+                           FontSize="24" FontWeight="Bold" Foreground="White"
+                           FontFamily="{StaticResource HebrewFont}" />
+
+                <!-- Step Indicator -->
+                <StackPanel Orientation="Horizontal" Margin="0,16,0,0" Spacing="8">
+                    <Border Background="{Binding Step1Background}" CornerRadius="16" Padding="12,6">
+                        <TextBlock Text="1. בחירת קבצים" Foreground="White" FontSize="13" />
+                    </Border>
+                    <TextBlock Text="→" Foreground="White" VerticalAlignment="Center" />
+                    <Border Background="{Binding Step2Background}" CornerRadius="16" Padding="12,6">
+                        <TextBlock Text="2. בדיקת מבנה" Foreground="White" FontSize="13" />
+                    </Border>
+                    <TextBlock Text="→" Foreground="White" VerticalAlignment="Center" />
+                    <Border Background="{Binding Step3Background}" CornerRadius="16" Padding="12,6">
+                        <TextBlock Text="3. ייבוא" Foreground="White" FontSize="13" />
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Content Area -->
+        <Border Grid.Row="1" Padding="24">
+            <Grid>
+                <!-- Step 1: File Selection -->
+                <StackPanel IsVisible="{Binding IsStep1}" Spacing="16">
+                    <TextBlock Text="בחר קבצי Word לייבוא" FontSize="18" FontWeight="SemiBold"
+                               FontFamily="{StaticResource HebrewFont}" />
+
+                    <Border Background="#F5F5F5" CornerRadius="8" Padding="24"
+                            BorderBrush="#E0E0E0" BorderThickness="2"
+                            DragDrop.AllowDrop="True">
+                        <StackPanel HorizontalAlignment="Center" Spacing="12">
+                            <TextBlock Text="📁" FontSize="48" HorizontalAlignment="Center" />
+                            <TextBlock Text="גרור קבצים לכאן" FontSize="16" Opacity="0.7"
+                                       HorizontalAlignment="Center" FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock Text="או" Opacity="0.5" HorizontalAlignment="Center" />
+                            <Button Content="בחר קבצים..." Command="{Binding SelectFilesCommand}"
+                                    HorizontalAlignment="Center" Padding="24,8" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Selected Files List -->
+                    <TextBlock Text="קבצים נבחרים:" FontWeight="SemiBold"
+                               IsVisible="{Binding HasFiles}"
+                               FontFamily="{StaticResource HebrewFont}" />
+
+                    <ListBox ItemsSource="{Binding SelectedFiles}"
+                             MaxHeight="200"
+                             IsVisible="{Binding HasFiles}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                    <TextBlock Grid.Column="0" Text="{Binding StatusIcon}" Margin="0,0,8,0" />
+                                    <TextBlock Grid.Column="1" Text="{Binding FileName}"
+                                               FontFamily="{StaticResource HebrewFont}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding StatusText}"
+                                               Opacity="0.6" Margin="8,0"
+                                               FontFamily="{StaticResource HebrewFont}" />
+                                    <Button Grid.Column="3" Content="✕"
+                                            Command="{Binding $parent[ListBox].((vm:ImportWizardViewModel)DataContext).RemoveFileCommand}"
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" Padding="4" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <!-- Step 2: Structure Review -->
+                <Grid IsVisible="{Binding IsStep2}" RowDefinitions="Auto,*">
+                    <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,16">
+                        <TextBlock Text="בדיקת מבנה הספר" FontSize="18" FontWeight="SemiBold"
+                                   FontFamily="{StaticResource HebrewFont}" />
+                        <TextBlock Text="בדוק שהמבנה שזוהה נכון. אפשר לשנות סוג פריט בלחיצה."
+                                   Opacity="0.7" FontFamily="{StaticResource HebrewFont}" />
+                    </StackPanel>
+
+                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto,*">
+                        <!-- Left: Preview Tree -->
+                        <Border Grid.Column="0" Background="#FAFAFA" CornerRadius="8" Padding="12">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top" Text="מבנה שזוהה" FontWeight="SemiBold"
+                                           Margin="0,0,0,8" FontFamily="{StaticResource HebrewFont}" />
+                                <TreeView ItemsSource="{Binding PreviewNodes}">
+                                    <TreeView.ItemTemplate>
+                                        <TreeDataTemplate ItemsSource="{Binding Children}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <ComboBox SelectedItem="{Binding NodeType}"
+                                                          Width="80" Padding="4">
+                                                    <ComboBoxItem Content="פרק" Tag="Chapter" />
+                                                    <ComboBoxItem Content="סעיף" Tag="Section" />
+                                                    <ComboBoxItem Content="תוכן" Tag="Content" />
+                                                </ComboBox>
+                                                <TextBlock Text="{Binding Title}"
+                                                           VerticalAlignment="Center"
+                                                           FontFamily="{StaticResource HebrewFont}" />
+                                            </StackPanel>
+                                        </TreeDataTemplate>
+                                    </TreeView.ItemTemplate>
+                                </TreeView>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- Divider -->
+                        <GridSplitter Grid.Column="1" Width="8" Background="Transparent" />
+
+                        <!-- Right: Text Preview -->
+                        <Border Grid.Column="2" Background="#FAFAFA" CornerRadius="8" Padding="12">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top" Text="תצוגה מקדימה" FontWeight="SemiBold"
+                                           Margin="0,0,0,8" FontFamily="{StaticResource HebrewFont}" />
+                                <ScrollViewer>
+                                    <TextBlock Text="{Binding SelectedPreviewText}"
+                                               TextWrapping="Wrap"
+                                               FontFamily="{StaticResource HebrewFont}" />
+                                </ScrollViewer>
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+
+                <!-- Step 3: Import Progress -->
+                <StackPanel IsVisible="{Binding IsStep3}" Spacing="16" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding ImportStatusText}" FontSize="18"
+                               HorizontalAlignment="Center"
+                               FontFamily="{StaticResource HebrewFont}" />
+
+                    <ProgressBar Value="{Binding ImportProgress}" Maximum="100"
+                                 Height="8" CornerRadius="4" Width="400" />
+
+                    <TextBlock Text="{Binding CurrentFileText}"
+                               HorizontalAlignment="Center" Opacity="0.7"
+                               FontFamily="{StaticResource HebrewFont}" />
+
+                    <!-- Results -->
+                    <Border Background="#E8F5E9" CornerRadius="8" Padding="16"
+                            IsVisible="{Binding ImportComplete}" Margin="0,16,0,0">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="✓ הייבוא הושלם בהצלחה!" FontSize="18" FontWeight="SemiBold"
+                                       Foreground="#2E7D32" HorizontalAlignment="Center"
+                                       FontFamily="{StaticResource HebrewFont}" />
+                            <TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource HebrewFont}">
+                                <Run Text="יובאו" />
+                                <Run Text="{Binding ImportedBooksCount}" FontWeight="Bold" />
+                                <Run Text="ספרים," />
+                                <Run Text="{Binding ImportedChaptersCount}" FontWeight="Bold" />
+                                <Run Text="פרקים" />
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Footer Buttons -->
+        <Border Grid.Row="2" Background="#F5F5F5" Padding="24,16"
+                BorderBrush="#E0E0E0" BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Grid.Column="0" Content="ביטול" Command="{Binding CancelCommand}"
+                        Padding="16,8" />
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                    <Button Content="◀ הקודם" Command="{Binding PreviousCommand}"
+                            IsVisible="{Binding CanGoPrevious}" Padding="16,8" />
+                    <Button Content="הבא ▶" Command="{Binding NextCommand}"
+                            IsVisible="{Binding CanGoNext}"
+                            Classes="primary" Padding="16,8" />
+                    <Button Content="ייבא" Command="{Binding ImportCommand}"
+                            IsVisible="{Binding CanImport}"
+                            Classes="primary" Padding="24,8" />
+                    <Button Content="סיום" Command="{Binding FinishCommand}"
+                            IsVisible="{Binding ImportComplete}"
+                            Classes="primary" Padding="24,8" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

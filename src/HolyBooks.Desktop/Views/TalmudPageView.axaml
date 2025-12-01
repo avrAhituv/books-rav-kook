@@ -1,0 +1,190 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:HolyBooks.Desktop.ViewModels"
+             x:Class="HolyBooks.Desktop.Views.TalmudPageView"
+             x:DataType="vm:TalmudViewModel"
+             FlowDirection="RightToLeft">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#F5F5F5" Padding="16,12"
+                BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- Title -->
+                <TextBlock Grid.Column="0"
+                           Text="{Binding HebrewTitle}"
+                           FontSize="20" FontWeight="Bold"
+                           FontFamily="{StaticResource HebrewFont}"
+                           VerticalAlignment="Center" />
+
+                <!-- Display Mode Toggle -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal"
+                            HorizontalAlignment="Center" Spacing="4">
+                    <RadioButton GroupName="DisplayMode" Content="צורת הדף"
+                                 IsChecked="{Binding DisplayMode, Converter={x:Static vm:TalmudDisplayMode.TzuratHaDaf}}"
+                                 Command="{Binding SetDisplayModeCommand}"
+                                 CommandParameter="{x:Static vm:TalmudDisplayMode.TzuratHaDaf}" />
+                    <RadioButton GroupName="DisplayMode" Content="ליניארי"
+                                 Command="{Binding SetDisplayModeCommand}"
+                                 CommandParameter="{x:Static vm:TalmudDisplayMode.Linear}" />
+                    <RadioButton GroupName="DisplayMode" Content="מודרני"
+                                 Command="{Binding SetDisplayModeCommand}"
+                                 CommandParameter="{x:Static vm:TalmudDisplayMode.Modern}" />
+                </StackPanel>
+
+                <!-- Daf Selector -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                    <ComboBox ItemsSource="{Binding AvailableDafim}"
+                              SelectedItem="{Binding Daf}"
+                              Width="80" />
+                    <Button Content="טען" Command="{Binding LoadPageCommand}"
+                            Padding="12,4" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content - Tzurat HaDaf -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,2*,*"
+              Margin="8" IsVisible="{Binding DisplayMode, Converter={StaticResource EqualConverter}, ConverterParameter={x:Static vm:TalmudDisplayMode.TzuratHaDaf}}">
+
+            <!-- Tosafot (Left/Outer) -->
+            <Border Grid.Column="0" Background="#FFFEF5"
+                    BorderBrush="#E0D8C0" BorderThickness="1"
+                    CornerRadius="4" Margin="4">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="תוספות"
+                               FontWeight="Bold" FontSize="14"
+                               Background="#F5EFE0" Padding="8,4"
+                               HorizontalAlignment="Stretch" TextAlignment="Center"
+                               FontFamily="{StaticResource HebrewFont}" />
+                    <ScrollViewer Padding="8">
+                        <ItemsControl ItemsSource="{Binding TosafotLines}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"
+                                               TextWrapping="Wrap"
+                                               FontSize="13" LineHeight="22"
+                                               FontFamily="{StaticResource HebrewFontSerif}"
+                                               Margin="0,0,0,8" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- Gemara (Center) -->
+            <Border Grid.Column="1" Background="White"
+                    BorderBrush="#D0D0D0" BorderThickness="2"
+                    CornerRadius="4" Margin="4">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="גמרא"
+                               FontWeight="Bold" FontSize="16"
+                               Background="#F0F0F0" Padding="8,6"
+                               HorizontalAlignment="Stretch" TextAlignment="Center"
+                               FontFamily="{StaticResource HebrewFont}" />
+                    <ScrollViewer Padding="16">
+                        <ItemsControl ItemsSource="{Binding GemaraLines}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"
+                                               TextWrapping="Wrap"
+                                               FontSize="18" LineHeight="32"
+                                               FontFamily="{StaticResource HebrewFontSerif}"
+                                               Margin="0,0,0,12" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- Rashi (Right/Inner) -->
+            <Border Grid.Column="2" Background="#FFFEF5"
+                    BorderBrush="#E0D8C0" BorderThickness="1"
+                    CornerRadius="4" Margin="4">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="רש&quot;י"
+                               FontWeight="Bold" FontSize="14"
+                               Background="#F5EFE0" Padding="8,4"
+                               HorizontalAlignment="Stretch" TextAlignment="Center"
+                               FontFamily="{StaticResource HebrewFont}" />
+                    <ScrollViewer Padding="8">
+                        <ItemsControl ItemsSource="{Binding RashiLines}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"
+                                               TextWrapping="Wrap"
+                                               FontSize="13" LineHeight="22"
+                                               FontFamily="{StaticResource HebrewFontSerif}"
+                                               Margin="0,0,0,8" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <!-- Linear View -->
+        <ScrollViewer Grid.Row="1" Padding="24"
+                      IsVisible="{Binding DisplayMode, Converter={StaticResource EqualConverter}, ConverterParameter={x:Static vm:TalmudDisplayMode.Linear}}">
+            <StackPanel MaxWidth="800" HorizontalAlignment="Center">
+                <ItemsControl ItemsSource="{Binding GemaraLines}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,24">
+                                <!-- Gemara -->
+                                <TextBlock Text="{Binding}"
+                                           TextWrapping="Wrap"
+                                           FontSize="20" LineHeight="36"
+                                           FontFamily="{StaticResource HebrewFontSerif}"
+                                           FontWeight="SemiBold" />
+
+                                <!-- Rashi (collapsible) -->
+                                <Expander Header="רש&quot;י" Margin="16,8,0,0">
+                                    <TextBlock Text="{Binding $parent[ItemsControl].((vm:TalmudViewModel)DataContext).RashiLines[0]}"
+                                               TextWrapping="Wrap"
+                                               FontSize="15" LineHeight="26"
+                                               FontFamily="{StaticResource HebrewFontSerif}"
+                                               Opacity="0.8"
+                                               Margin="8" />
+                                </Expander>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Loading Overlay -->
+        <Border Grid.Row="1" Background="#80FFFFFF"
+                IsVisible="{Binding IsLoading}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="200" />
+                <TextBlock Text="טוען..." FontSize="16" Margin="0,12,0,0"
+                           HorizontalAlignment="Center"
+                           FontFamily="{StaticResource HebrewFont}" />
+            </StackPanel>
+        </Border>
+
+        <!-- Footer Navigation -->
+        <Border Grid.Row="2" Background="#F5F5F5" Padding="16,12"
+                BorderBrush="#E0E0E0" BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Grid.Column="0" Content="◀ דף קודם"
+                        Command="{Binding PreviousPageCommand}"
+                        Padding="16,8" />
+
+                <TextBlock Grid.Column="1" Text="{Binding HebrewTitle}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           FontFamily="{StaticResource HebrewFont}" Opacity="0.7" />
+
+                <Button Grid.Column="2" Content="דף הבא ▶"
+                        Command="{Binding NextPageCommand}"
+                        Padding="16,8" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
