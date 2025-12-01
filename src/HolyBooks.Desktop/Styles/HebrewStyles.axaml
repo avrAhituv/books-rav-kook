@@ -1,0 +1,117 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- כיוון RTL לכל האפליקציה -->
+    <Style Selector="Window">
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+    </Style>
+
+    <!-- סגנון טקסט עברי -->
+    <Style Selector="TextBlock.hebrew">
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}" />
+        <Setter Property="TextAlignment" Value="Right" />
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+    </Style>
+
+    <!-- סגנון לקריאה -->
+    <Style Selector="TextBlock.reader">
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFontSerif}" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="LineHeight" Value="36" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="TextAlignment" Value="Right" />
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="Margin" Value="0,8" />
+    </Style>
+
+    <!-- כותרת -->
+    <Style Selector="TextBlock.heading">
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="FontSize" Value="{StaticResource HeadingFontSize}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,16,0,8" />
+    </Style>
+
+    <!-- כותרת משנית -->
+    <Style Selector="TextBlock.subheading">
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextAlignment" Value="Right" />
+        <Setter Property="Margin" Value="0,12,0,4" />
+    </Style>
+
+    <!-- TreeView בעברית -->
+    <Style Selector="TreeViewItem">
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Padding" Value="4" />
+    </Style>
+
+    <!-- TabControl בעברית -->
+    <Style Selector="TabItem">
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Padding" Value="12,8" />
+    </Style>
+
+    <!-- כפתור -->
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="{StaticResource PrimaryColor}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <!-- TextBox בעברית -->
+    <Style Selector="TextBox.hebrew">
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Padding" Value="8" />
+    </Style>
+
+    <!-- ListBox -->
+    <Style Selector="ListBoxItem">
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="FontFamily" Value="{StaticResource HebrewFont}" />
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+
+    <!-- Sidebar Panel -->
+    <Style Selector="Border.sidebar">
+        <Setter Property="Background" Value="#F5F5F5" />
+        <Setter Property="BorderBrush" Value="#E0E0E0" />
+        <Setter Property="BorderThickness" Value="0,0,1,0" />
+        <Setter Property="Width" Value="280" />
+    </Style>
+
+    <!-- Card Style -->
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#E0E0E0" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Margin" Value="8" />
+        <Setter Property="BoxShadow" Value="0 2 4 0 #20000000" />
+    </Style>
+
+    <!-- Search Result Item -->
+    <Style Selector="Border.search-result">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#E0E0E0" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="Padding" Value="12" />
+    </Style>
+
+    <Style Selector="Border.search-result:pointerover">
+        <Setter Property="Background" Value="#F5F5F5" />
+    </Style>
+
+</Styles>

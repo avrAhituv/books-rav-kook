@@ -1,0 +1,33 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="HolyBooks.Desktop.App"
+             RequestedThemeVariant="Light">
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://HolyBooks.Desktop/Styles/HebrewStyles.axaml" />
+    </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- צבעים -->
+            <Color x:Key="PrimaryColor">#1976D2</Color>
+            <Color x:Key="SecondaryColor">#424242</Color>
+            <Color x:Key="AccentColor">#FFC107</Color>
+            <Color x:Key="BackgroundColor">#FAFAFA</Color>
+            <Color x:Key="SurfaceColor">#FFFFFF</Color>
+            <Color x:Key="TextPrimaryColor">#212121</Color>
+            <Color x:Key="TextSecondaryColor">#757575</Color>
+
+            <!-- גופנים -->
+            <FontFamily x:Key="HebrewFont">David, Noto Serif Hebrew, Segoe UI</FontFamily>
+            <FontFamily x:Key="HebrewFontSerif">Frank Ruhl Libre, David, Segoe UI</FontFamily>
+
+            <!-- מידות -->
+            <x:Double x:Key="DefaultFontSize">18</x:Double>
+            <x:Double x:Key="HeadingFontSize">24</x:Double>
+            <x:Double x:Key="SmallFontSize">14</x:Double>
+            <Thickness x:Key="DefaultMargin">8</Thickness>
+            <Thickness x:Key="DefaultPadding">12</Thickness>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
