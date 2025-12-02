@@ -1,10 +1,10 @@
+using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
+using OpenXmlWordprocessing = DocumentFormat.OpenXml.Wordprocessing;
 using HolyBooks.Core.Models;
-using QuestPdfDocument = QuestPDF.Fluent.Document;
 
 namespace HolyBooks.Desktop.Services;
 
@@ -26,7 +26,7 @@ public class ExportService
     /// </summary>
     public void ExportSourceSheetToPdf(SourceSheet sheet, List<SheetItem> items, string outputPath)
     {
-        QuestPdfDocument.Create(container =>
+        Document.Create(container =>
         {
             container.Page(page =>
             {
@@ -145,7 +145,7 @@ public class ExportService
     /// </summary>
     public void ExportChapterToPdf(Chapter chapter, Content content, string outputPath)
     {
-        QuestPdfDocument.Create(container =>
+        Document.Create(container =>
         {
             container.Page(page =>
             {
@@ -199,13 +199,13 @@ public class ExportService
         using var doc = WordprocessingDocument.Create(outputPath, WordprocessingDocumentType.Document);
 
         var mainPart = doc.AddMainDocumentPart();
-        mainPart.Document = new Document();
-        var body = mainPart.Document.AppendChild(new Body());
+        mainPart.Document = new OpenXmlWordprocessing.Document();
+        var body = mainPart.Document.AppendChild(new OpenXmlWordprocessing.Body());
 
         // RTL Settings for Hebrew
-        var sectionProps = new SectionProperties(
-            new BiDi(),
-            new PageMargin
+        var sectionProps = new OpenXmlWordprocessing.SectionProperties(
+            new OpenXmlWordprocessing.BiDi(),
+            new OpenXmlWordprocessing.PageMargin
             {
                 Top = 1440,    // 1 inch in twips
                 Right = 1440,
@@ -223,7 +223,7 @@ public class ExportService
             body.AppendChild(CreateParagraph(sheet.Description, italic: true));
         }
 
-        body.AppendChild(new Paragraph()); // Empty line
+        body.AppendChild(new OpenXmlWordprocessing.Paragraph()); // Empty line
 
         // Items
         foreach (var item in items.OrderBy(i => i.SortOrder))
@@ -244,11 +244,11 @@ public class ExportService
 
                     // Source text in a bordered paragraph
                     var sourcePara = CreateParagraph(item.SourceText ?? "");
-                    var pProps = sourcePara.GetFirstChild<ParagraphProperties>() ?? new ParagraphProperties();
-                    pProps.AppendChild(new ParagraphBorders(
-                        new RightBorder { Val = BorderValues.Single, Size = 12, Color = "CCCCCC" }
+                    var pProps = sourcePara.GetFirstChild<OpenXmlWordprocessing.ParagraphProperties>() ?? new OpenXmlWordprocessing.ParagraphProperties();
+                    pProps.AppendChild(new OpenXmlWordprocessing.ParagraphBorders(
+                        new OpenXmlWordprocessing.RightBorder { Val = OpenXmlWordprocessing.BorderValues.Single, Size = 12, Color = "CCCCCC" }
                     ));
-                    pProps.AppendChild(new Indentation { Right = "720" }); // 0.5 inch indent
+                    pProps.AppendChild(new OpenXmlWordprocessing.Indentation { Right = "720" }); // 0.5 inch indent
                     body.AppendChild(sourcePara);
 
                     // Note
@@ -257,17 +257,17 @@ public class ExportService
                         body.AppendChild(CreateParagraph($"הערה: {item.Note}", italic: true, shading: "FFFDE7"));
                     }
 
-                    body.AppendChild(new Paragraph()); // Empty line
+                    body.AppendChild(new OpenXmlWordprocessing.Paragraph()); // Empty line
                     break;
 
                 case "divider":
-                    var dividerPara = new Paragraph(
-                        new ParagraphProperties(
-                            new ParagraphBorders(
-                                new BottomBorder { Val = BorderValues.Single, Size = 6, Color = "CCCCCC" }
+                    var dividerPara = new OpenXmlWordprocessing.Paragraph(
+                        new OpenXmlWordprocessing.ParagraphProperties(
+                            new OpenXmlWordprocessing.ParagraphBorders(
+                                new OpenXmlWordprocessing.BottomBorder { Val = OpenXmlWordprocessing.BorderValues.Single, Size = 6, Color = "CCCCCC" }
                             )
                         ),
-                        new Run(new Text(" "))
+                        new OpenXmlWordprocessing.Run(new OpenXmlWordprocessing.Text(" "))
                     );
                     body.AppendChild(dividerPara);
                     break;
@@ -277,7 +277,7 @@ public class ExportService
         body.AppendChild(sectionProps);
     }
 
-    private Paragraph CreateHeadingParagraph(string text, int level, bool center)
+    private OpenXmlWordprocessing.Paragraph CreateHeadingParagraph(string text, int level, bool center)
     {
         var fontSize = level switch
         {
@@ -286,59 +286,59 @@ public class ExportService
             _ => "28"  // 14pt
         };
 
-        var run = new Run(
-            new RunProperties(
-                new Bold(),
-                new FontSize { Val = fontSize },
-                new RunFonts { Ascii = "David", HighAnsi = "David", ComplexScript = "David" },
-                new RightToLeftText()
+        var run = new OpenXmlWordprocessing.Run(
+            new OpenXmlWordprocessing.RunProperties(
+                new OpenXmlWordprocessing.Bold(),
+                new OpenXmlWordprocessing.FontSize { Val = fontSize },
+                new OpenXmlWordprocessing.RunFonts { Ascii = "David", HighAnsi = "David", ComplexScript = "David" },
+                new OpenXmlWordprocessing.RightToLeftText()
             ),
-            new Text(text)
+            new OpenXmlWordprocessing.Text(text)
         );
 
-        var paraProps = new ParagraphProperties(
-            new BiDi(),
-            new SpacingBetweenLines { After = "200" }
+        var paraProps = new OpenXmlWordprocessing.ParagraphProperties(
+            new OpenXmlWordprocessing.BiDi(),
+            new OpenXmlWordprocessing.SpacingBetweenLines { After = "200" }
         );
 
         if (center)
         {
-            paraProps.AppendChild(new Justification { Val = JustificationValues.Center });
+            paraProps.AppendChild(new OpenXmlWordprocessing.Justification { Val = OpenXmlWordprocessing.JustificationValues.Center });
         }
 
-        return new Paragraph(paraProps, run);
+        return new OpenXmlWordprocessing.Paragraph(paraProps, run);
     }
 
-    private Paragraph CreateParagraph(string text, bool bold = false, bool italic = false,
+    private OpenXmlWordprocessing.Paragraph CreateParagraph(string text, bool bold = false, bool italic = false,
                                        string? color = null, string? shading = null)
     {
-        var runProps = new RunProperties(
-            new FontSize { Val = "28" }, // 14pt
-            new RunFonts { Ascii = "David", HighAnsi = "David", ComplexScript = "David" },
-            new RightToLeftText()
+        var runProps = new OpenXmlWordprocessing.RunProperties(
+            new OpenXmlWordprocessing.FontSize { Val = "28" }, // 14pt
+            new OpenXmlWordprocessing.RunFonts { Ascii = "David", HighAnsi = "David", ComplexScript = "David" },
+            new OpenXmlWordprocessing.RightToLeftText()
         );
 
-        if (bold) runProps.AppendChild(new Bold());
-        if (italic) runProps.AppendChild(new Italic());
-        if (color != null) runProps.AppendChild(new Color { Val = color });
+        if (bold) runProps.AppendChild(new OpenXmlWordprocessing.Bold());
+        if (italic) runProps.AppendChild(new OpenXmlWordprocessing.Italic());
+        if (color != null) runProps.AppendChild(new OpenXmlWordprocessing.Color { Val = color });
 
-        var run = new Run(runProps, new Text(text));
+        var run = new OpenXmlWordprocessing.Run(runProps, new OpenXmlWordprocessing.Text(text));
 
-        var paraProps = new ParagraphProperties(
-            new BiDi(),
-            new SpacingBetweenLines { Line = "360", LineRule = LineSpacingRuleValues.Auto }
+        var paraProps = new OpenXmlWordprocessing.ParagraphProperties(
+            new OpenXmlWordprocessing.BiDi(),
+            new OpenXmlWordprocessing.SpacingBetweenLines { Line = "360", LineRule = OpenXmlWordprocessing.LineSpacingRuleValues.Auto }
         );
 
         if (shading != null)
         {
-            paraProps.AppendChild(new Shading
+            paraProps.AppendChild(new OpenXmlWordprocessing.Shading
             {
-                Val = ShadingPatternValues.Clear,
+                Val = OpenXmlWordprocessing.ShadingPatternValues.Clear,
                 Fill = shading
             });
         }
 
-        return new Paragraph(paraProps, run);
+        return new OpenXmlWordprocessing.Paragraph(paraProps, run);
     }
 
     /// <summary>
@@ -349,13 +349,13 @@ public class ExportService
         using var doc = WordprocessingDocument.Create(outputPath, WordprocessingDocumentType.Document);
 
         var mainPart = doc.AddMainDocumentPart();
-        mainPart.Document = new Document();
-        var body = mainPart.Document.AppendChild(new Body());
+        mainPart.Document = new OpenXmlWordprocessing.Document();
+        var body = mainPart.Document.AppendChild(new OpenXmlWordprocessing.Body());
 
         // RTL Settings
-        var sectionProps = new SectionProperties(
-            new BiDi(),
-            new PageMargin { Top = 1440, Right = 1440, Bottom = 1440, Left = 1440 }
+        var sectionProps = new OpenXmlWordprocessing.SectionProperties(
+            new OpenXmlWordprocessing.BiDi(),
+            new OpenXmlWordprocessing.PageMargin { Top = 1440, Right = 1440, Bottom = 1440, Left = 1440 }
         );
 
         // Book title
@@ -366,7 +366,7 @@ public class ExportService
 
         // Chapter title
         body.AppendChild(CreateHeadingParagraph(chapter.Title, 1, true));
-        body.AppendChild(new Paragraph());
+        body.AppendChild(new OpenXmlWordprocessing.Paragraph());
 
         // Content - split by paragraphs
         var paragraphs = content.TextContent.Split(new[] { "\n\n", "\r\n\r\n" },
