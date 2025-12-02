@@ -1,7 +1,8 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="using:HolyBooks.Desktop.Converters">
 
-    <!-- משאבים - גופנים וצבעים -->
+    <!-- משאבים - גופנים, צבעים וממירים -->
     <Styles.Resources>
         <ResourceDictionary>
             <!-- צבעים -->
@@ -23,6 +24,20 @@
             <x:Double x:Key="SmallFontSize">14</x:Double>
             <Thickness x:Key="DefaultMargin">8</Thickness>
             <Thickness x:Key="DefaultPadding">12</Thickness>
+
+            <!-- ממירים -->
+            <conv:EqualConverter x:Key="EqualConverter" />
+            <conv:NotEqualConverter x:Key="NotEqualConverter" />
+            <conv:DirtyTextConverter x:Key="DirtyTextConverter" />
+            <conv:ContainsConverter x:Key="ContainsConverter" />
+            <conv:HtmlToPlainTextConverter x:Key="HtmlToPlainTextConverter" />
+            <conv:NumberToHebrewConverter x:Key="NumberToHebrewConverter" />
+            <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <conv:BooleanToOpacityConverter x:Key="BooleanToOpacityConverter" />
+            <conv:ThemeToColorConverter x:Key="ThemeToColorConverter" />
+            <conv:TruncateConverter x:Key="TruncateConverter" />
+            <conv:HebrewDateConverter x:Key="HebrewDateConverter" />
+            <conv:RelativeTimeConverter x:Key="RelativeTimeConverter" />
         </ResourceDictionary>
     </Styles.Resources>
 

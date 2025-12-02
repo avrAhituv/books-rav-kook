@@ -1,14 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:HolyBooks.Desktop.ViewModels"
-             xmlns:converters="using:HolyBooks.Desktop.Converters"
              x:Class="HolyBooks.Desktop.Views.TanakhView"
              x:DataType="vm:TanakhViewModel"
              FlowDirection="RightToLeft">
-
-    <UserControl.Resources>
-        <converters:ContainsConverter x:Key="ContainsConverter" />
-    </UserControl.Resources>
 
     <Grid ColumnDefinitions="250,*">
 

@@ -25,6 +25,42 @@ public class EqualConverter : IValueConverter
 }
 
 /// <summary>
+/// ממיר לבדיקת אי-שוויון ערכים
+/// </summary>
+public class NotEqualConverter : IValueConverter
+{
+    public static readonly NotEqualConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value?.ToString() != parameter?.ToString();
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+/// <summary>
+/// ממיר בוליאני לטקסט "שונה/נשמר"
+/// </summary>
+public class DirtyTextConverter : IValueConverter
+{
+    public static readonly DirtyTextConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is true ? "שינויים לא נשמרו" : "נשמר";
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+/// <summary>
 /// ממיר לבדיקה אם רשימה מכילה ערך
 /// </summary>
 public class ContainsConverter : IMultiValueConverter

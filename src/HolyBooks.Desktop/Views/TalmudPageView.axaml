@@ -1,14 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:HolyBooks.Desktop.ViewModels"
-             xmlns:converters="using:HolyBooks.Desktop.Converters"
              x:Class="HolyBooks.Desktop.Views.TalmudPageView"
              x:DataType="vm:TalmudViewModel"
              FlowDirection="RightToLeft">
-
-    <UserControl.Resources>
-        <converters:EqualConverter x:Key="EqualConverter" />
-    </UserControl.Resources>
 
     <Grid RowDefinitions="Auto,*,Auto">
 
