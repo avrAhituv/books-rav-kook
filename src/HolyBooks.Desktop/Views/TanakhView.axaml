@@ -79,11 +79,9 @@
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <ToggleButton Content="{Binding}"
-                                                  IsChecked="{Binding $parent[UserControl].((vm:TanakhViewModel)DataContext).SelectedCommentaries, Converter={StaticResource ContainsConverter}, ConverterParameter={Binding}}"
-                                                  Command="{Binding $parent[UserControl].((vm:TanakhViewModel)DataContext).ToggleCommentaryCommand}"
-                                                  CommandParameter="{Binding}"
+                                <DataTemplate x:DataType="vm:CommentarySelectionItem">
+                                    <ToggleButton Content="{Binding Name}"
+                                                  IsChecked="{Binding IsSelected}"
                                                   Padding="8,4" Margin="2"
                                                   FontSize="12"
                                                   FontFamily="{StaticResource HebrewFont}" />

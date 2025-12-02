@@ -62,22 +62,34 @@ public class DirtyTextConverter : IValueConverter
 
 /// <summary>
 /// ממיר לבדיקה אם רשימה מכילה ערך
+/// Value = collection, Parameter = item to check
 /// </summary>
-public class ContainsConverter : IMultiValueConverter
+public class ContainsConverter : IValueConverter
 {
     public static readonly ContainsConverter Instance = new();
 
-    public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (values.Count < 2)
-            return false;
-
-        if (values[0] is IEnumerable<string> collection && values[1] is string item)
+        if (value is IEnumerable<string> collection && parameter is string item)
         {
             return collection.Contains(item);
         }
 
+        if (value is System.Collections.IEnumerable enumerable && parameter != null)
+        {
+            foreach (var elem in enumerable)
+            {
+                if (elem?.Equals(parameter) == true || elem?.ToString() == parameter.ToString())
+                    return true;
+            }
+        }
+
         return false;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
     }
 }
 

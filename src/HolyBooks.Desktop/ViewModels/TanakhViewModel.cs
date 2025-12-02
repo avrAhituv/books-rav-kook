@@ -28,16 +28,12 @@ public partial class TanakhViewModel : ObservableObject
     // Verses
     public ObservableCollection<VerseViewModel> Verses { get; } = new();
 
-    // Selected commentaries
-    public ObservableCollection<string> AvailableCommentaries { get; } = new()
-    {
-        "רש\"י", "אבן עזרא", "רמב\"ן", "ספורנו", "אור החיים", "מצודת דוד", "מצודת ציון", "מלבי\"ם"
-    };
+    // Commentaries with selection state
+    public ObservableCollection<CommentarySelectionItem> AvailableCommentaries { get; } = new();
 
-    public ObservableCollection<string> SelectedCommentaries { get; } = new()
-    {
-        "רש\"י", "אבן עזרא"
-    };
+    // Convenience property for getting selected commentary names
+    public IEnumerable<string> SelectedCommentaryNames =>
+        AvailableCommentaries.Where(c => c.IsSelected).Select(c => c.Name);
 
     // Book structure
     public ObservableCollection<TanakhBookInfo> Books { get; } = new();
@@ -49,7 +45,28 @@ public partial class TanakhViewModel : ObservableObject
     public TanakhViewModel(SefariaService sefaria)
     {
         _sefaria = sefaria;
+        InitializeCommentaries();
         InitializeBooks();
+    }
+
+    private void InitializeCommentaries()
+    {
+        var commentaries = new[]
+        {
+            ("רש\"י", true),
+            ("אבן עזרא", true),
+            ("רמב\"ן", false),
+            ("ספורנו", false),
+            ("אור החיים", false),
+            ("מצודת דוד", false),
+            ("מצודת ציון", false),
+            ("מלבי\"ם", false)
+        };
+
+        foreach (var (name, isSelected) in commentaries)
+        {
+            AvailableCommentaries.Add(new CommentarySelectionItem { Name = name, IsSelected = isSelected });
+        }
     }
 
     private void InitializeBooks()
@@ -133,7 +150,7 @@ public partial class TanakhViewModel : ObservableObject
                     };
 
                     // Add commentaries
-                    foreach (var commentaryName in SelectedCommentaries)
+                    foreach (var commentaryName in SelectedCommentaryNames)
                     {
                         if (chapter.Commentaries.TryGetValue(commentaryName, out var commentaries))
                         {
@@ -188,18 +205,6 @@ public partial class TanakhViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    public void ToggleCommentary(string commentary)
-    {
-        if (SelectedCommentaries.Contains(commentary))
-        {
-            SelectedCommentaries.Remove(commentary);
-        }
-        else
-        {
-            SelectedCommentaries.Add(commentary);
-        }
-    }
 }
 
 public class TanakhBookInfo
@@ -248,4 +253,12 @@ public class CommentaryViewModel
 {
     public string Name { get; set; } = "";
     public string Text { get; set; } = "";
+}
+
+public partial class CommentarySelectionItem : ObservableObject
+{
+    public string Name { get; set; } = "";
+
+    [ObservableProperty]
+    private bool _isSelected;
 }
