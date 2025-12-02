@@ -1,9 +1,14 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:HolyBooks.Desktop.ViewModels"
+             xmlns:converters="using:HolyBooks.Desktop.Converters"
              x:Class="HolyBooks.Desktop.Views.TanakhView"
              x:DataType="vm:TanakhViewModel"
              FlowDirection="RightToLeft">
+
+    <UserControl.Resources>
+        <converters:ContainsConverter x:Key="ContainsConverter" />
+    </UserControl.Resources>
 
     <Grid ColumnDefinitions="250,*">
 
@@ -61,9 +66,9 @@
                                    VerticalAlignment="Center" />
                         <TextBlock Text="פרק" VerticalAlignment="Center"
                                    FontFamily="{StaticResource HebrewFont}" />
-                        <ComboBox ItemsSource="{Binding TotalChapters}"
-                                  SelectedIndex="{Binding CurrentChapter}"
-                                  Width="70" />
+                        <NumericUpDown Value="{Binding SelectedChapter}"
+                                       Minimum="1" Maximum="{Binding TotalChapters}"
+                                       Width="80" />
                         <Button Content="טען" Command="{Binding LoadChapterCommand}"
                                 Padding="12,4" />
                     </StackPanel>
@@ -172,7 +177,7 @@
                                FontFamily="{StaticResource HebrewFont}" Opacity="0.7">
                         <Run Text="{Binding HebrewBookName}" />
                         <Run Text=" פרק " />
-                        <Run Text="{Binding CurrentChapter}" />
+                        <Run Text="{Binding SelectedChapter}" />
                     </TextBlock>
 
                     <Button Grid.Column="2" Content="פרק הבא ▶"

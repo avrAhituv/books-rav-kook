@@ -19,7 +19,6 @@
 
     <Window.KeyBindings>
         <KeyBinding Gesture="Ctrl+F" Command="{Binding ToggleSearchPanelCommand}" />
-        <KeyBinding Gesture="Ctrl+T" Command="{Binding OpenInNewTabCommand}" />
         <KeyBinding Gesture="Ctrl+W" Command="{Binding CloseTabCommand}" CommandParameter="{Binding SelectedTab}" />
         <KeyBinding Gesture="Ctrl+OemPlus" Command="{Binding IncreaseFontSizeCommand}" />
         <KeyBinding Gesture="Ctrl+OemMinus" Command="{Binding DecreaseFontSizeCommand}" />
@@ -474,22 +473,22 @@
                     </DockPanel>
 
                     <!-- Tanakh View -->
-                    <views:TanakhView IsVisible="{Binding SelectedNavigationIndex,
+                    <views:TanakhView IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedNavigationIndex,
                                       Converter={StaticResource EqualConverter}, ConverterParameter=1}"
                                       DataContext="{Binding TanakhViewModel}" />
 
                     <!-- Talmud View -->
-                    <views:TalmudPageView IsVisible="{Binding SelectedNavigationIndex,
+                    <views:TalmudPageView IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedNavigationIndex,
                                           Converter={StaticResource EqualConverter}, ConverterParameter=2}"
                                           DataContext="{Binding TalmudViewModel}" />
 
                     <!-- Source Sheet Editor -->
-                    <views:SourceSheetEditorView IsVisible="{Binding SelectedNavigationIndex,
+                    <views:SourceSheetEditorView IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedNavigationIndex,
                                                  Converter={StaticResource EqualConverter}, ConverterParameter=3}"
                                                  DataContext="{Binding SourceSheetEditorViewModel}" />
 
                     <!-- Settings View -->
-                    <views:SettingsView IsVisible="{Binding SelectedNavigationIndex,
+                    <views:SettingsView IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).SelectedNavigationIndex,
                                         Converter={StaticResource EqualConverter}, ConverterParameter=4}"
                                         DataContext="{Binding SettingsViewModel}" />
                 </Grid>
