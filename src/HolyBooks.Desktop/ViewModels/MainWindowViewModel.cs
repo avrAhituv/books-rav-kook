@@ -128,7 +128,6 @@ public partial class MainWindowViewModel : ObservableObject
         OpenInNewTab(e.Chapter, e.Content);
     }
 
-    [RelayCommand]
     private void OpenInNewTab(Chapter chapter, Content? content)
     {
         // Check if already open

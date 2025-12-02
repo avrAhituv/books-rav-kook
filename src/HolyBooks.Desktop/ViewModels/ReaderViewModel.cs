@@ -85,7 +85,6 @@ public partial class ReaderViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
     public async Task AddBookmark(int position, string? title = null)
     {
         if (CurrentContent == null) return;
@@ -101,7 +100,6 @@ public partial class ReaderViewModel : ObservableObject
         await _db.SaveChangesAsync();
     }
 
-    [RelayCommand]
     public async Task AddNote(int startPosition, int endPosition, string noteText, string color = "#FFFF00")
     {
         if (CurrentContent == null) return;
@@ -120,7 +118,6 @@ public partial class ReaderViewModel : ObservableObject
         await _db.SaveChangesAsync();
     }
 
-    [RelayCommand]
     public async Task SaveReadingPosition(double scrollPosition)
     {
         if (CurrentContent == null) return;

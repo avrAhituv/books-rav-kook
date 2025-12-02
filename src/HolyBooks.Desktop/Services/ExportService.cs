@@ -1,10 +1,10 @@
-using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using HolyBooks.Core.Models;
+using QuestPdfDocument = QuestPDF.Fluent.Document;
 
 namespace HolyBooks.Desktop.Services;
 
@@ -26,7 +26,7 @@ public class ExportService
     /// </summary>
     public void ExportSourceSheetToPdf(SourceSheet sheet, List<SheetItem> items, string outputPath)
     {
-        Document.Create(container =>
+        QuestPdfDocument.Create(container =>
         {
             container.Page(page =>
             {
@@ -145,7 +145,7 @@ public class ExportService
     /// </summary>
     public void ExportChapterToPdf(Chapter chapter, Content content, string outputPath)
     {
-        Document.Create(container =>
+        QuestPdfDocument.Create(container =>
         {
             container.Page(page =>
             {
